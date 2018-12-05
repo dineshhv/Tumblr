@@ -11,27 +11,34 @@ const _ = require('lodash');
 var cron = require('node-cron');
 var cache = require('memory-cache');
 
+cache.put('stop', false)
 const app = express();
-cron.schedule('5 * * * *', () => {
+cron.schedule('* * * * *', () => {
   console.log("Cron Running")
   var before = cache.get('before')
+  var stop = cache.get('stop')
   var query = {}
-  if (before) {
-    query.before = before
+  if (!stop) {
+    if (before) {
+      query.before = before
+    }
+    console.log(query)
+    query.limit = 20
+    userLikesService.get_likes(query)
+      .then(response => {
+        var urls = fetcherService.fetch(response.liked_posts)
+        var items = resourceservice.upload_resource(urls)
+        if ('_links' in response && 'next' in response._links) {
+          var before = response._links.next.query_params.before
+          cache.put('before', before);
+        } else {
+          cache.put('stop', true)
+        }
+
+      }).catch(e => {
+        console.log(e)
+      })
   }
-  query.limit = 20
-  userLikesService.get_likes(query)
-    .then(response => {
-      var urls = fetcherService.fetch(response.liked_posts)
-      var items = resourceservice.upload_resource(urls)
-      if ('_links' in response && 'next' in response._links) {
-        var before = response._links.next.query_params.before
-        cache.put('before', before);
-      }
-      console.log(response)
-    }).catch(e => {
-      console.log(e)
-    })
   console.log('running a task every minute');
 });
 module.exports = require('./config/express')(app, config);
