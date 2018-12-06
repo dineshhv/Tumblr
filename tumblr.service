@@ -1,0 +1,14 @@
+[Unit]
+Description=Tumblr
+After=network.target
+
+[Service]
+Type=simple
+User=ec2-user
+Group=ec2-user
+WorkingDirectory=/home/ec2-user/Tumblr
+ExecStart=/usr/bin/npm start
+#ExecStart=/usr/bin/node app.js
+
+[Install]
+WantedBy=multi-user.target
