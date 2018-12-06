@@ -83,7 +83,7 @@ module.exports.fetch = function (blogData) {
               })
             }
           } catch (err) {
-            console.log("ERROR:" + ' http' + m[1])
+            console.log("ERROR:" + json.media.url)
           }
         });
       }

@@ -23,6 +23,7 @@ module.exports.getTumblr = function (req, res, next) {
   userLikesService.get_likes(query)
     .then(response => {
       var urls = fetcherService.fetch(response.liked_posts)
+
       var items = resourceservice.upload_resource(urls)
       if ('_links' in response && 'next' in response._links) {
         var before = response._links.next.query_params.before
