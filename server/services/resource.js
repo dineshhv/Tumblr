@@ -20,13 +20,13 @@ module.exports = {
         var length = url.length
         url.forEach(function(element) {
             if(element.type == "IMAGE"){
-                put_from_url(element.url, "tumblr-downloads/", element.fileName, 'IMAGE', function(err, res) {
+                put_from_url(element.url, process.env.AWS_BUCKET+"/", element.fileName, 'IMAGE', function(err, res) {
                     if (err)
                         throw err;
                         items.push('Uploaded data successfully!');
                 });
             } else if(element.type == "VIDEO"){
-                put_from_url(element.url, "tumblr-downloads/", element.fileName, 'VIDEO', function(err, res) {
+                put_from_url(element.url, process.env.AWS_BUCKET+"/", element.fileName, 'VIDEO', function(err, res) {
                     if (err)
                         throw err;
                         items.push('Uploaded data successfully!');
