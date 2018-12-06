@@ -8,48 +8,56 @@ module.exports.fetch = function (blogData) {
     if (obj.type == 'photo') {
       if ('photos' in obj) {
         obj.photos.forEach(function (files, key) {
-          var type = checkURL(files.original_size.url)
-          var fileName
-          if (obj.slug) {
-            if (obj.slug == ' ' || obj.slug == '') {
-              fileName = obj.id + '-file:' + key + '.' + type
+          try {
+            var type = checkURL(files.original_size.url)
+            var fileName
+            if (obj.slug) {
+              if (obj.slug == ' ' || obj.slug == '') {
+                fileName = obj.id + '-file:' + key + '.' + type
+              } else {
+                fileName = obj.slug.replace(/ /g, '-') + '.' + type
+              }
             } else {
-              fileName = obj.slug.replace(/ /g, '-') + '.' + type
+              fileName = obj.id + '-file:' + key + '.' + type
             }
-          } else {
-            fileName = obj.id + '-file:' + key + '.' + type
+            urls.push({
+              fileName,
+              url: files.original_size.url,
+              type: "IMAGE",
+              tags: obj.tags
+            })
+          } catch (err) {
+            console.log("ERROR:" + ' http' + m[1])
           }
-          urls.push({
-            fileName,
-            url: files.original_size.url,
-            type: "IMAGE",
-            tags: obj.tags
-          })
         })
       }
     } else if (obj.type == 'text') {
       var name
       if (obj.slug) {
         if (obj.slug == ' ' || obj.slug == '') {
-          name = obj.id
+          name = obj.id + '-file:' + new Date().getTime()
         } else {
           name = obj.slug.replace(/ /g, '-')
         }
       } else {
-        name = obj.id
+        name = obj.id+ '-file:' + new Date().getTime()
       }
       var m, rex = /<img[^>]+src="http([^">]+)/g;
       while (m = rex.exec(obj.trail[0].content_raw)) {
-        var type = checkURL('http' + m[1])
-        fileName = name + '-file:' + new Date().getTime()+ '.' + type
+        try {
+          var type = checkURL('http' + m[1])
+          fileName = name  + '.' + type
 
 
-        urls.push({
-          fileName,
-          url: 'http' + m[1],
-          type: "IMAGE",
-          tags: obj.tags
-        })
+          urls.push({
+            fileName,
+            url: 'http' + m[1],
+            type: "IMAGE",
+            tags: obj.tags
+          })
+        } catch (err) {
+          console.log("ERROR:" + ' http' + m[1])
+        }
       }
 
 
@@ -66,7 +74,7 @@ module.exports.fetch = function (blogData) {
             var json = JSON.parse(match)
             if (json && 'type' in json && json.type == "video") {
               var type = checkURL(json.media.url)
-              fileName = name + '-file:' + new Date().getTime()+ '.' + type
+              fileName = name+ '.' + type
               urls.push({
                 fileName,
                 url: json.media.url,
@@ -75,31 +83,35 @@ module.exports.fetch = function (blogData) {
               })
             }
           } catch (err) {
-            // console.log("JSON ERROR")
+            console.log("ERROR:" + ' http' + m[1])
           }
         });
       }
       //   console.log(images)
       //   console.log(videos)
     } else if (obj.type == 'video') {
-      var type = checkURL(obj.video_url)
+      try {
+        var type = checkURL(obj.video_url)
 
-      var fileName
-      if (obj.slug) {
-        if (obj.slug == ' ' || obj.slug == '') {
-          fileName = obj.id + '-file:' + new Date().getTime() + '.' + type
+        var fileName
+        if (obj.slug) {
+          if (obj.slug == ' ' || obj.slug == '') {
+            fileName = obj.id + '-file:' + new Date().getTime() + '.' + type
+          } else {
+            fileName = obj.slug.replace(/ /g, '-') + '.' + type
+          }
         } else {
-          fileName = obj.slug.replace(/ /g, '-') + '.' + type
+          fileName = obj.id + '-file:' + new Date().getTime() + '.' + type
         }
-      } else {
-        fileName = obj.id + '-file:' + new Date().getTime() + '.' + type
+        urls.push({
+          fileName,
+          url: obj.video_url,
+          type: "VIDEO",
+          tags: obj.tags
+        })
+      } catch (err) {
+        console.log("ERROR:" + ' http' + m[1])
       }
-      urls.push({
-        fileName,
-        url: obj.video_url,
-        type: "VIDEO",
-        tags: obj.tags
-      })
     }
 
   });
