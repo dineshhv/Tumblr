@@ -13,7 +13,7 @@ var cache = require('memory-cache');
 
 cache.put('stop', false)
 const app = express();
-cron.schedule('* * * * *', () => {
+cron.schedule('*/5 0 * * *', () => {
   console.log("Cron Running")
   var before = cache.get('before')
   var stop = cache.get('stop')
