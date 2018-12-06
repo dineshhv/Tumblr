@@ -27,7 +27,11 @@ module.exports.fetch = function (blogData) {
               tags: obj.tags
             })
           } catch (err) {
-            console.log("ERROR:" + ' http' + m[1])
+            console.log("*******************************************")
+            console.log("PHOTO")
+            console.log(' http' + m[1])
+            console.log("*******************************************")
+
           }
         })
       }
@@ -40,13 +44,13 @@ module.exports.fetch = function (blogData) {
           name = obj.slug.replace(/ /g, '-')
         }
       } else {
-        name = obj.id+ '-file:' + new Date().getTime()
+        name = obj.id + '-file:' + new Date().getTime()
       }
       var m, rex = /<img[^>]+src="http([^">]+)/g;
       while (m = rex.exec(obj.trail[0].content_raw)) {
         try {
           var type = checkURL('http' + m[1])
-          fileName = name  + '.' + type
+          fileName = name + '.' + type
 
 
           urls.push({
@@ -56,7 +60,11 @@ module.exports.fetch = function (blogData) {
             tags: obj.tags
           })
         } catch (err) {
-          console.log("ERROR:" + ' http' + m[1])
+          console.log("*******************************************")
+          console.log("Text - Photo")
+          console.log('http' + m[1])
+          console.log("*******************************************")
+
         }
       }
 
@@ -71,10 +79,16 @@ module.exports.fetch = function (blogData) {
 
         m.forEach((match, groupIndex) => {
           try {
+            if (match[0] != '{') {
+              console.log("******************TEXT-VIDEO: JSON FAILED*************************")
+              match = '{' + match
+            }
+            
             var json = JSON.parse(match)
+            console.log("******************TEXT-VIDEO: JSON WORKED*************************")
             if (json && 'type' in json && json.type == "video") {
               var type = checkURL(json.media.url)
-              fileName = name+ '.' + type
+              fileName = name + '.' + type
               urls.push({
                 fileName,
                 url: json.media.url,
@@ -83,7 +97,10 @@ module.exports.fetch = function (blogData) {
               })
             }
           } catch (err) {
-            console.log("ERROR:" + match)
+            console.log("*******************************************")
+            console.log("Text - Video")
+            console.log(match)
+            console.log("*******************************************")
           }
         });
       }
@@ -110,7 +127,10 @@ module.exports.fetch = function (blogData) {
           tags: obj.tags
         })
       } catch (err) {
-        console.log("ERROR:" + ' http' + m[1])
+        console.log("*******************************************")
+        console.log("VIDEO")
+        console.log(obj.video_url)
+        console.log("*******************************************")
       }
     }
 

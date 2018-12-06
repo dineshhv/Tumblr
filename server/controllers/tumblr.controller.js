@@ -23,14 +23,13 @@ module.exports.getTumblr = function (req, res, next) {
   userLikesService.get_likes(query)
     .then(response => {
       var urls = fetcherService.fetch(response.liked_posts)
-
+      console.log(urls)
       var items = resourceservice.upload_resource(urls)
       if ('_links' in response && 'next' in response._links) {
         var before = response._links.next.query_params.before
-        console.log(before)
-        res.send(before)
+        res.send(response._links)
       } else {
-          res.send(end)
+        res.send(end)
       }
       
     }).catch(e => {
